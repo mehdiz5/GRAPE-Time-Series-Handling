@@ -29,25 +29,61 @@ def create_node(df, mode):
         node = sample_node.tolist() + feature_node.tolist()
     return node
 
-def create_edge(df):
-    n_row, n_col = df.shape
+def create_edge(df, time_steps=0, time_attr=1):
+    """
+    Creates edges for a bipartite graph, incorporating temporal dependencies.
+    Edges connect:
+    - Samples to features (from DataFrame values).
+    - Rows to preceding rows (temporal edges up to `time_steps`).
+    """
+    nrow, ncol = df.shape
     edge_start = []
     edge_end = []
-    for x in range(n_row):
-        edge_start = edge_start + [x] * n_col # obj
-        edge_end = edge_end + list(n_row+np.arange(n_col)) # att    
-    edge_start_new = edge_start + edge_end
-    edge_end_new = edge_end + edge_start
-    return (edge_start_new, edge_end_new)
 
-def create_edge_attr(df):
+    # Create edges between rows (samples) and columns (features)
+    for i in range(nrow):
+        for j in range(ncol):
+            edge_start.append(i)
+            edge_end.append(nrow + j)  # Offset feature indices by nrow
+
+    # Add temporal edges between rows
+    temporal_edges_start = []
+    temporal_edges_end = []
+    if time_steps > 0:
+        for i in range(nrow):
+            for t in range(1, time_steps + 1):
+                if i - t >= 0:  # Ensure temporal connection is valid
+                    temporal_edges_start.append(i)
+                    temporal_edges_end.append(i - t)
+
+    # Combine bidirectional edges
+    edge_start_new = edge_start + edge_end + temporal_edges_start + temporal_edges_end
+    edge_end_new = edge_end + edge_start + temporal_edges_end + temporal_edges_start
+
+    return edge_start_new, edge_end_new
+
+def create_edge_attr(df, time_steps=0, time_attr=1):
+    """
+    Creates attributes for edges in the graph. 
+    Default attribute for temporal edges is `time_attr`.
+    """
     nrow, ncol = df.shape
+
+    # Attributes for sample-to-feature edges
     edge_attr = []
     for i in range(nrow):
         for j in range(ncol):
-            edge_attr.append([float(df.iloc[i,j])])
-    edge_attr = edge_attr + edge_attr
-    return edge_attr
+            edge_attr.append([float(df.iloc[i, j])])
+
+    # Duplicate attributes for bidirectional feature edges
+    edge_attr = edge_attr * 2
+
+    # Attributes for temporal edges (default to `time_attr`)
+    temporal_edge_attr = []
+    if time_steps > 0:
+        temporal_edge_attr = [[time_attr]] * (time_steps * nrow)
+
+    return edge_attr + temporal_edge_attr + temporal_edge_attr
 
 def get_data(df_X, df_y, node_mode, train_edge_prob, split_sample_ratio, split_by, train_y_prob, seed=0, normalize=True):
     if len(df_y.shape)==1:
