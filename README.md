@@ -41,6 +41,7 @@ To train feature imputation on Flixster, Douban and YahooMusic:
 # flixster, douban, yahoo_music
 python train_mdi.py mc --data flixster
 ```
+*Note : --time_step and --time_attr should be defined in the case a time series data*
 
 The results will be saved in "uci/test/dataset_name" or "mc/test/dataset_name". For more training options, look at the arguments in "train_mdi.py" and "train_y.py" as well as "uci/uci_subparser.py" and "mc/mc_subparser.py".
 

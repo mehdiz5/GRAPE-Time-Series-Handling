@@ -46,6 +46,8 @@ def main():
     parser.add_argument('--transfer_dir', type=str, default=None)
     parser.add_argument('--transfer_extra', type=str, default='')
     parser.add_argument('--mode', type=str, default='train') # debug
+    parser.add_argument('--time_steps', type=int, default=0) 
+    parser.add_argument('--time_attr', type=int, default=1) 
     subparsers = parser.add_subparsers()
     add_uci_subparser(subparsers)
     add_mc_subparser(subparsers)

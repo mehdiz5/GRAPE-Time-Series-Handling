@@ -85,7 +85,7 @@ def create_edge_attr(df, time_steps=0, time_attr=1):
 
     return edge_attr + temporal_edge_attr + temporal_edge_attr
 
-def get_data(df_X, df_y, node_mode, train_edge_prob, split_sample_ratio, split_by, train_y_prob, seed=0, normalize=True):
+def get_data(df_X, df_y, node_mode, train_edge_prob, split_sample_ratio, split_by, train_y_prob, seed=0, normalize=True, time_steps = 0, time_attr= 1):
     if len(df_y.shape)==1:
         df_y = df_y.to_numpy()
     elif len(df_y.shape)==2:
@@ -96,9 +96,9 @@ def get_data(df_X, df_y, node_mode, train_edge_prob, split_sample_ratio, split_b
         min_max_scaler = preprocessing.MinMaxScaler()
         x_scaled = min_max_scaler.fit_transform(x)
         df_X = pd.DataFrame(x_scaled)
-    edge_start, edge_end = create_edge(df_X)
+    edge_start, edge_end = create_edge(df_X, time_steps, time_attr)
     edge_index = torch.tensor([edge_start, edge_end], dtype=int)
-    edge_attr = torch.tensor(create_edge_attr(df_X), dtype=torch.float)
+    edge_attr = torch.tensor(create_edge_attr(df_X, time_steps, time_attr), dtype=torch.float)
     node_init = create_node(df_X, node_mode) 
     x = torch.tensor(node_init, dtype=torch.float)
     y = torch.tensor(df_y, dtype=torch.float)
@@ -198,7 +198,7 @@ def load_data(args):
     df_X = pd.DataFrame(df_np[:, :-1])
     if not hasattr(args,'split_sample'):
         args.split_sample = 0
-    data = get_data(df_X, df_y, args.node_mode, args.train_edge, args.split_sample, args.split_by, args.train_y, args.seed)
+    data = get_data(df_X, df_y, args.node_mode, args.train_edge, args.split_sample, args.split_by, args.train_y, args.seed, True, args.time_steps, args.time_attr)
     return data
 
 

@@ -39,6 +39,8 @@ def main():
     parser.add_argument('--valid', type=float, default=0.) # valid-set ratio
     parser.add_argument('--seed', type=int, default=0)
     parser.add_argument('--log_dir', type=str, default='y0')
+    parser.add_argument('--time_steps', type=int, default=0) 
+    parser.add_argument('--time_attr', type=int, default=1) 
     subparsers = parser.add_subparsers()
     add_uci_subparser(subparsers)
     args = parser.parse_args()
