@@ -106,8 +106,8 @@ def get_data(df_X, df_y, node_mode, train_edge_prob, split_sample_ratio, split_b
     #set seed to fix known/unknwon edges
     torch.manual_seed(seed)
     #keep train_edge_prob of all edges
-    train_edge_mask = get_known_mask(train_edge_prob, int(edge_attr.shape[0]/2))
-    double_train_edge_mask = torch.cat((train_edge_mask, train_edge_mask), dim=0)
+    train_edge_mask = get_known_mask(train_edge_prob, int(edge_attr.shape[0]/2) - time_steps*int(df_X.shape[0]))
+    double_train_edge_mask = torch.cat((train_edge_mask, train_edge_mask, torch.tensor([1]*int(df_X.shape[0])*2)), dim=0)
 
     #mask edges based on the generated train_edge_mask
     #train_edge_index is known, test_edge_index in unknwon, i.e. missing
