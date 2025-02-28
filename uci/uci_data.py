@@ -193,6 +193,7 @@ def get_data(df_X, df_y, node_mode, train_edge_prob, split_sample_ratio, split_b
 
 def load_data(args):
     uci_path = osp.dirname(osp.abspath(inspect.getfile(inspect.currentframe())))
+    print(uci_path)
     df_np = np.loadtxt(uci_path+'/raw_data/{}/data/data.txt'.format(args.data))
     df_y = pd.DataFrame(df_np[:, -1:])
     df_X = pd.DataFrame(df_np[:, :-1])
